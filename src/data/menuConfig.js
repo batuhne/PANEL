@@ -1,8 +1,5 @@
 /**
  * Menu Configuration for Sidebar Components
- * Implements FUN-01: Extract Method - Long menuItems arrays extracted
- * NAM-01: Meaningful names that reveal intent
- * SMELL-01: Eliminate duplicated code between user/admin menus
  */
 
 // Base menu items shared by both user and admin dashboards
