@@ -4,7 +4,7 @@ import logger from '../../utils/logger'
 const Header = ({ currentSection = 'Overview', isAdmin = false }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
 
-  const toggleProfileMenu = () => {
+  const handleProfileMenuToggle = () => {
     setShowProfileMenu(!showProfileMenu)
   }
 
@@ -69,7 +69,7 @@ const Header = ({ currentSection = 'Overview', isAdmin = false }) => {
               <i className="ri-user-line text-primary"></i>
             </div>
             <button 
-              onClick={toggleProfileMenu}
+              onClick={handleProfileMenuToggle}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
             >
               <i className="ri-more-2-line"></i>

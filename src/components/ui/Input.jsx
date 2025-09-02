@@ -13,13 +13,13 @@ const Input = ({
   required = false,
   ...props
 }) => {
-  const [showPassword, setShowPassword] = useState(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [focused, setFocused] = useState(false)
   
-  const actualType = showPasswordToggle && showPassword ? 'text' : type
+  const actualType = showPasswordToggle && isPasswordVisible ? 'text' : type
   
   const handlePasswordToggle = () => {
-    setShowPassword(!showPassword)
+    setIsPasswordVisible(!isPasswordVisible)
   }
   
   return (
@@ -77,7 +77,7 @@ const Input = ({
           >
             <i 
               className={`${
-                showPassword ? 'ri-eye-off-line' : 'ri-eye-line'
+                isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'
               } text-gray-400 hover:text-primary transition-colors text-sm`}
             ></i>
           </button>

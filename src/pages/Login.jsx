@@ -9,7 +9,7 @@ const Login = () => {
     email: '',
     password: ''
   })
-  const [showPassword, setShowPassword] = useState(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   
@@ -46,8 +46,8 @@ const Login = () => {
     }, 2000)
   }
   
-  const togglePassword = () => {
-    setShowPassword(!showPassword)
+  const handlePasswordToggle = () => {
+    setIsPasswordVisible(!isPasswordVisible)
   }
   
   return (
@@ -97,7 +97,7 @@ const Login = () => {
                   </div>
                 </div>
                 <input 
-                  type={showPassword ? "text" : "password"}
+                  type={isPasswordVisible ? "text" : "password"}
                   id="password" 
                   name="password" 
                   placeholder="Enter your password"
@@ -109,9 +109,9 @@ const Login = () => {
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <div 
                     className="w-5 h-5 flex items-center justify-center password-toggle" 
-                    onClick={togglePassword}
+                    onClick={handlePasswordToggle}
                   >
-                    <i className={`${showPassword ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 text-sm`}></i>
+                    <i className={`${isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 text-sm`}></i>
                   </div>
                 </div>
               </div>
