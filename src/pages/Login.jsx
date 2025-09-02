@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import logger from '../utils/logger'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -22,7 +23,11 @@ const Login = () => {
     
     setIsLoading(true)
     
-    console.log('Login attempt:', { email: formData.email })
+    logger.info('Login attempt initiated', { 
+      email: formData.email,
+      action: 'login_attempt',
+      userAgent: navigator.userAgent.substring(0, 50) // First 50 chars only
+    })
     
     // Simulate API call with user type detection
     setTimeout(() => {

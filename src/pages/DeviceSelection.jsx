@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import logger from '../utils/logger'
 
 const DeviceSelection = () => {
   const navigate = useNavigate()
@@ -50,7 +51,10 @@ const DeviceSelection = () => {
   }
 
   const handleLogout = () => {
-    console.log('Logging out...')
+    logger.info('User logout initiated', { 
+      action: 'logout_request',
+      currentPage: 'device_selection'
+    })
     // Clear stored user type and any auth data
     localStorage.removeItem('userType')
     navigate('/', { replace: true })

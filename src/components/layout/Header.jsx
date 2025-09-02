@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import logger from '../../utils/logger'
 
 const Header = ({ currentSection = 'Overview', isAdmin = false }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
@@ -15,7 +16,10 @@ const Header = ({ currentSection = 'Overview', isAdmin = false }) => {
     // Navigate to login page
     window.location.href = '/login'
     
-    console.log('User signed out successfully')
+    logger.info('User signed out successfully', { 
+      userType: isAdmin ? 'admin' : 'user',
+      action: 'sign_out'
+    })
   }
 
   // Close dropdowns when clicking outside

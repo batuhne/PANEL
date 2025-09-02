@@ -1,5 +1,6 @@
 // AWS configuration for Amplify, Cognito, IoT Core
 // This will be configured when backend is ready
+import logger from '../utils/logger'
 
 export const awsConfig = {
   // AWS Cognito Configuration
@@ -41,7 +42,11 @@ export const initializeAWS = () => {
   // TODO: Configure AWS Amplify
   // import { Amplify } from 'aws-amplify'
   // Amplify.configure(awsConfig)
-  console.log('AWS configuration ready for initialization')
+  logger.debug('AWS configuration ready for initialization', {
+    service: 'aws_config',
+    status: 'ready',
+    hasApiUrl: !!process.env.REACT_APP_API_URL
+  })
 }
 
 export default awsConfig
