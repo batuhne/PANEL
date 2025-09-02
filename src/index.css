@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles from HTML design */
+.input-focus:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.password-toggle {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: #4CAF50;
+}
+
+.checkbox-custom {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkbox-custom:checked {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.checkbox-custom:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.125rem;
+  width: 0.375rem;
+  height: 0.625rem;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-custom:hover {
+  border-color: #4CAF50;
+}
+
+/* Device Card Animations from HTML */
+.device-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.device-card:hover {
+  transform: translateY(-4px);
+  border-color: #4CAF50;
+  box-shadow: 0 10px 25px rgba(76, 175, 80, 0.15);
+}
+
+.device-card:hover .arrow-icon {
+  color: #4CAF50;
+  transform: translateX(4px);
+}
+
+.arrow-icon {
+  transition: all 0.3s ease;
+}
+
+/* Sidebar Animations from User Dashboard HTML */
+.sidebar-item {
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+}
+
+.sidebar-item.active {
+  background-color: rgba(76, 175, 80, 0.15);
+  border-radius: 8px;
+  border-left: 3px solid #4CAF50;
+}
+
+.sidebar-item.active .sidebar-icon {
+  color: #4CAF50;
+}
+
+.sidebar-item.active .sidebar-text {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.sidebar-item.expandable {
+  position: relative;
+}
+
+.sidebar-arrow {
+  transition: transform 0.2s ease;
+  color: #6b7280;
+}
+
+.sidebar-arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.sidebar-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.sidebar-submenu.expanded {
+  max-height: 500px;
+}
+
+.sidebar-subitem {
+  padding: 8px 12px 8px 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.sidebar-subitem:hover {
+  background-color: rgba(76, 175, 80, 0.05);
+  color: #4CAF50;
+}
+
+.sidebar-subitem.active {
+  color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.1);
+}

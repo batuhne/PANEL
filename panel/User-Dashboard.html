@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POTENTIAL - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#81C784'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+        .sidebar-item:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+        }
+        .sidebar-item.active {
+            background-color: rgba(76, 175, 80, 0.15);
+            border-radius: 8px;
+            border-left: 3px solid #4CAF50;
+        }
+        .sidebar-item.active .sidebar-icon {
+            color: #4CAF50;
+        }
+        .sidebar-item.active .sidebar-text {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+        .sidebar-item.expandable {
+            position: relative;
+        }
+        .sidebar-arrow {
+            transition: transform 0.2s ease;
+            color: #6b7280;
+        }
+        .sidebar-arrow.expanded {
+            transform: rotate(90deg);
+        }
+        .sidebar-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .sidebar-submenu.expanded {
+            max-height: 500px;
+        }
+        .sidebar-subitem {
+            padding: 8px 12px 8px 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .sidebar-subitem:hover {
+            background-color: rgba(76, 175, 80, 0.05);
+            color: #4CAF50;
+        }
+        .sidebar-subitem.active {
+            color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Top Bar -->
+    <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 fixed top-0 left-0 right-0 z-50">
+        <!-- Left side - Logo and current section -->
+        <div class="flex items-center space-x-6">
+            <h1 class="text-xl font-normal text-primary">POTENTIAL</h1>
+            <div class="text-gray-400">|</div>
+            <span class="text-gray-700 font-medium" id="currentSection">Overview</span>
+        </div>
+        
+        <!-- Right side - Notifications and Profile -->
+        <div class="flex items-center space-x-4">
+            <!-- Notifications -->
+            <button class="relative p-2 text-gray-500 hover:text-primary transition-colors duration-200">
+                <i class="ri-notification-line text-xl"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <!-- Profile -->
+            <div class="flex items-center space-x-3">
+                <div class="text-right">
+                    <div class="text-sm font-medium text-gray-900">User Name</div>
+                    </div>
+                </div>
+                <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <i class="ri-user-line text-primary"></i>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="ri-more-2-line"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex pt-16">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-16">
+            <nav class="p-4 space-y-1">
+                <!-- Overview -->
+                <div class="sidebar-item active p-3 cursor-pointer" onclick="setActiveSection('Overview')">
+                    <div class="flex items-center space-x-3">
+                        <i class="ri-dashboard-line text-lg sidebar-icon text-gray-600"></i>
+                        <span class="sidebar-text text-gray-700">Overview</span>
+                    </div>
+                </div>
+
+                <!-- Predictions -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('predictions')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-crystal-ball-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">Predictions</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="predictions-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="predictions-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Yield Forecast')">Yield Forecast</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Quality (DM/Starch)')">Quality (DM/Starch)</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Harvest Window')">Harvest Window</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Assumptions & Confidence')">Assumptions & Confidence</div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('recommendations')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-lightbulb-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">Recommendations</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="recommendations-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="recommendations-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Irrigation Plan')">Irrigation Plan</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Fertilization Plan')">Fertilization Plan</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Harvest Plan')">Harvest Plan</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Task Checklist')">Task Checklist</div>
+                </div>
+
+                <!-- Alerts -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('alerts')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-alarm-warning-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">Alerts</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="alerts-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="alerts-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Active')">Active</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Acknowledged')">Acknowledged</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Resolved')">Resolved</div>
+                </div>
+
+                <!-- Live Data -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('livedata')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-line-chart-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">Live Data</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="livedata-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="livedata-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Soil Sensors')">Soil Sensors</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Weather Station')">Weather Station</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Spectral / NIR')">Spectral / NIR</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Compare')">Compare</div>
+                </div>
+
+                <!-- Maps & Zones -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('maps')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-map-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">Maps & Zones</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="maps-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="maps-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Layers')">Layers</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Zones')">Zones</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Compare')">Compare</div>
+                </div>
+
+                <!-- Camera -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('camera')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-camera-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">Camera</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="camera-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="camera-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Live')">Live</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Timeline')">Timeline</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Gallery')">Gallery</div>
+                </div>
+
+                <!-- History & Reports -->
+                <div class="sidebar-item expandable p-3 cursor-pointer" onclick="toggleSubmenu('history')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="ri-file-chart-line text-lg sidebar-icon text-gray-600"></i>
+                            <span class="sidebar-text text-gray-700">History & Reports</span>
+                        </div>
+                        <i class="ri-arrow-right-s-line sidebar-arrow" id="history-arrow"></i>
+                    </div>
+                </div>
+                <div class="sidebar-submenu" id="history-submenu">
+                    <div class="sidebar-subitem" onclick="setActiveSection('Season Summary')">Season Summary</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Activity Log')">Activity Log</div>
+                    <div class="sidebar-subitem" onclick="setActiveSection('Exports')">Exports</div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 ml-64 p-6">
+            <div class="bg-white rounded-2xl shadow-lg p-8 min-h-96">
+                <div class="text-center text-gray-500">
+                    <i class="ri-dashboard-line text-4xl mb-4"></i>
+                    <p class="text-lg">Dashboard content will be loaded here</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function setActiveSection(sectionName) {
+            // Update current section in header
+            document.getElementById('currentSection').textContent = sectionName;
+            
+            // Remove active class from all sidebar items and subitems
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.sidebar-subitem').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            if (event.currentTarget.classList.contains('sidebar-subitem')) {
+                event.currentTarget.classList.add('active');
+            } else {
+                event.currentTarget.classList.add('active');
+            }
+            
+            console.log('Section changed to:', sectionName);
+            // Here you would load the actual content for each section
+        }
+
+        function toggleSubmenu(menuId) {
+            const submenu = document.getElementById(menuId + '-submenu');
+            const arrow = document.getElementById(menuId + '-arrow');
+            
+            // Toggle submenu
+            submenu.classList.toggle('expanded');
+            arrow.classList.toggle('expanded');
+            
+            // Prevent event bubbling to setActiveSection
+            event.stopPropagation();
+        }
+    </script>
+</body>
+</html>
