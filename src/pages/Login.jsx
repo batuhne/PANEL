@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logger from '../utils/logger'
+import { handleValidationError, handleAuthError } from '../utils/errorHandler'
+import useLoadingState from '../hooks/useLoadingState'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -11,39 +13,100 @@ const Login = () => {
   })
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [validationError, setValidationError] = useState(null)
+  
+  // loading state management
+  const {
+    isLoading,
+    error: authError,
+    execute: executeLogin
+  } = useLoadingState({
+    operation: 'user_login',
+    timeout: 10000, // 10 second timeout
+    maxRetries: 2,
+    autoRetry: false // Manual retry for login
+  })
   
   const handleSubmit = async (e) => {
     e.preventDefault()
     
+    // Clear previous errors
+    setValidationError(null)
+    
+    // Validate form inputs
     if (!formData.email || !formData.password) {
-      alert('Please fill in all required fields')
+      const validationResult = handleValidationError(
+        'email_password', 
+        'Email and password are required',
+        { email: formData.email, password: !!formData.password }
+      )
+      setValidationError(validationResult.error)
+      return
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      const validationResult = handleValidationError(
+        'email',
+        'Please enter a valid email address',
+        formData.email
+      )
+      setValidationError(validationResult.error)
       return
     }
     
-    setIsLoading(true)
-    
-    logger.info('Login attempt initiated', { 
-      email: formData.email,
-      action: 'login_attempt',
-      userAgent: navigator.userAgent.substring(0, 50) // First 50 chars only
-    })
-    
-    // Simulate API call with user type detection
-    setTimeout(() => {
-      // Store user type based on login credentials
-      let userType = 'user' // default
-      if (formData.email === 'admin@potential.com') {
-        userType = 'admin'
-      }
+    try {
+      await executeLogin(async () => {
+        logger.info('Login attempt initiated', { 
+          email: formData.email,
+          action: 'login_attempt',
+          userAgent: navigator.userAgent.substring(0, 50)
+        })
+        
+        // Simulate API call with user type detection
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            // Simulate authentication logic
+            const validEmails = ['admin@potential.com', 'user@potential.com']
+            
+            if (!validEmails.includes(formData.email)) {
+              reject(new Error('Invalid email or password'))
+              return
+            }
+
+            // Determine user type based on login credentials
+            const userType = formData.email === 'admin@potential.com' ? 'admin' : 'user'
+            
+            // Store user type in localStorage for DeviceSelection to use
+            localStorage.setItem('userType', userType)
+            
+            logger.info('Login successful', { 
+              email: formData.email,
+              userType,
+              action: 'login_success'
+            })
+            
+            resolve({ userType })
+          }, 2000)
+        })
+      }, {
+        email: formData.email,
+        rememberMe,
+        loginAttempt: true
+      })
       
-      // Store user type in localStorage for DeviceSelection to use
-      localStorage.setItem('userType', userType)
-      
-      // Redirect to device selection without alert
+      // Navigate to device selection on successful login
       navigate('/devices')
-      setIsLoading(false)
-    }, 2000)
+      
+    } catch (error) {
+      // Error is already handled by useLoadingState and errorHandler
+      logger.warn('Login failed', {
+        email: formData.email,
+        errorType: error.name,
+        action: 'login_failed'
+      })
+    }
   }
   
   const handlePasswordToggle = () => {
@@ -61,6 +124,18 @@ const Login = () => {
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Error Messages */}
+            {(validationError || authError) && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <div className="flex items-center">
+                  <i className="ri-error-warning-line text-red-600 mr-2" aria-hidden="true" />
+                  <p className="text-sm text-red-700" role="alert">
+                    {validationError?.message || authError?.message || 'An error occurred during login'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Email Input */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">

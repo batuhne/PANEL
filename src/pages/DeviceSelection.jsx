@@ -1,11 +1,25 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logger from '../utils/logger'
+import { handleDeviceError } from '../utils/errorHandler'
+import useLoadingState from '../hooks/useLoadingState'
 
 const DeviceSelection = () => {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
   const [loadingDevice, setLoadingDevice] = useState(null)
+  
+  // loading state management  
+  const {
+    isLoading,
+    error: deviceError,
+    execute: executeDeviceConnection,
+    reset: resetError
+  } = useLoadingState({
+    operation: 'device_connection',
+    timeout: 5000, // 5 second timeout for device connection
+    maxRetries: 3,
+    autoRetry: true // Auto-retry for device connections
+  })
 
   // Get user type from localStorage (set during login)
   const loggedInUserType = localStorage.getItem('userType') || 'user'
@@ -28,12 +42,44 @@ const DeviceSelection = () => {
   const handleDeviceClick = async (device) => {
     if (isLoading) return
     
-    setIsLoading(true)
     setLoadingDevice(device.id)
+    resetError() // Clear any previous errors
     
     try {
-      // Simulate device connection check
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      await executeDeviceConnection(async () => {
+        logger.info('Device connection attempt initiated', {
+          deviceId: device.id,
+          deviceName: device.name,
+          userType: loggedInUserType,
+          action: 'device_connection_attempt'
+        })
+        
+        // Simulate device connection check
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            // Simulate occasional connection failures for demonstration
+            const connectionSuccess = Math.random() > 0.2 // 80% success rate
+            
+            if (!connectionSuccess) {
+              reject(new Error(`Connection to ${device.name} failed - device may be offline`))
+              return
+            }
+
+            logger.info('Device connection successful', {
+              deviceId: device.id,
+              deviceName: device.name,
+              userType: loggedInUserType,
+              action: 'device_connection_success'
+            })
+            
+            resolve({ deviceId: device.id, deviceName: device.name })
+          }, 1500)
+        })
+      }, {
+        deviceId: device.id,
+        deviceName: device.name,
+        userType: loggedInUserType
+      })
       
       // Navigate based on logged in user type (not device type)
       if (loggedInUserType === 'admin') {
@@ -41,11 +87,16 @@ const DeviceSelection = () => {
       } else {
         navigate('/dashboard/user')
       }
+      
     } catch (error) {
-      console.error('Device connection failed:', error)
-      alert('Failed to connect to device. Please try again.')
+      // Error is already handled by useLoadingState and errorHandler
+      logger.warn('Device connection failed', {
+        deviceId: device.id,
+        deviceName: device.name,
+        errorType: error.name,
+        action: 'device_connection_failed'
+      })
     } finally {
-      setIsLoading(false)
       setLoadingDevice(null)
     }
   }
@@ -68,6 +119,27 @@ const DeviceSelection = () => {
           <h1 className="text-2xl font-normal text-primary mb-6">POTANTIAL</h1>
           <p className="text-gray-600 text-sm">Select Device</p>
         </div>
+
+        {/* Error Message */}
+        {deviceError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <i className="ri-error-warning-line text-red-600 mr-3 mt-0.5" aria-hidden="true" />
+              <div className="flex-1">
+                <p className="text-sm text-red-700 mb-2" role="alert">
+                  {deviceError.message || 'Device connection failed'}
+                </p>
+                <button
+                  onClick={resetError}
+                  className="text-xs text-red-600 hover:text-red-800 underline"
+                  type="button"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Device Cards */}
         <div className="space-y-4">
