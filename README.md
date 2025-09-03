@@ -28,11 +28,12 @@ src/
 │   │   ├── Sidebar.jsx  # User navigation menu
 │   │   ├── AdminSidebar.jsx  # Admin navigation menu
 │   │   └── DashboardLayout.jsx
-│   └── ui/              # Base UI components
-│       ├── Button.jsx   # Reusable button component
-│       ├── Input.jsx    # Form input component
-│       ├── Checkbox.jsx # Custom checkbox
-│       └── LoadingSpinner.jsx
+│   ├── ui/              # Base UI components
+│   │   ├── Button.jsx   # Reusable button component
+│   │   ├── Input.jsx    # Form input component
+│   │   ├── Checkbox.jsx # Custom checkbox
+│   │   └── LoadingSpinner.jsx
+│   └── ErrorBoundary.jsx # React error boundary for error catching
 ├── pages/               # Route components
 │   ├── Login.jsx        # Authentication page
 │   ├── DeviceSelection.jsx  # Device/field selection
@@ -40,12 +41,18 @@ src/
 │   └── AdminDashboard.jsx   # Admin interface
 ├── hooks/               # Custom React hooks
 │   ├── useNavigation.js # Navigation utilities
-│   └── useToggle.js     # Toggle state hook
+│   ├── useToggle.js     # Toggle state hook
+│   └── useLoadingState.js # Professional loading state management
 ├── services/            # API and external services
 │   ├── api.js          # API client configuration
 │   ├── auth.js         # Authentication services
 │   └── aws-config.js   # AWS configuration
-└── utils/               # Utility functions
+├── utils/               # Utility functions
+│   ├── logger.js        # Structured logging system
+│   ├── errors.js        # Custom error classes
+│   └── errorHandler.js  # Centralized error handling
+└── data/                # Configuration data
+    └── menuConfig.js    # Navigation menu configuration
 ```
 
 ## Design System
@@ -63,7 +70,6 @@ src/
 
 ### **Icons**
 - **RemixIcon** library for consistent iconography
-- Focus on agricultural and IoT-related icons
 
 ## Getting Started
 
@@ -137,8 +143,7 @@ export default ComponentName
 
 The project roadmap includes:
 - **Accessibility improvements** (WCAG 2.1 AA compliance)
-- **Comprehensive testing** (Unit + Integration tests)
+- **Comprehensive testing** (Unit + Integration tests with error scenarios)
 - **Performance optimization** (Code splitting, lazy loading)
-- **Enhanced design system** (Professional component library)
-- **TypeScript migration** (Optional future consideration)
+- **Design system** (Component library)
 
