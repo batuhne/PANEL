@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logger from '../utils/logger'
-import { handleDeviceError } from '../utils/errorHandler'
+// DeviceSelection component - removing unused handleDeviceError import
 import useLoadingState from '../hooks/useLoadingState'
 
 const DeviceSelection = () => {
@@ -146,8 +146,17 @@ const DeviceSelection = () => {
           {devices.map((device) => (
             <div 
               key={device.id}
-              className="device-card bg-white rounded-2xl shadow-lg p-6 border-2 border-transparent cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label={`Select ${device.name} device (${device.signal} signal)`}
+              className="device-card bg-white rounded-2xl shadow-lg p-6 border-2 border-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50"
               onClick={() => handleDeviceClick(device)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  handleDeviceClick(device)
+                }
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">

@@ -28,6 +28,13 @@ const Sidebar = ({ onSectionChange }) => {
     }))
   }
 
+  const handleKeyNavigation = (callback, event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      callback()
+    }
+  }
+
   const isActiveParent = (menuItem) => {
     if (activeSection === menuItem.label) {
       return true
@@ -37,12 +44,16 @@ const Sidebar = ({ onSectionChange }) => {
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 fixed left-0 top-16 bottom-0 overflow-y-auto">
-      <nav className="p-4 space-y-1">
+      <nav className="p-4 space-y-1" role="navigation" aria-label="User navigation menu">
         {menuItems.map((menuItem) => (
           <div key={menuItem.id}>
             {/* Main Menu Item */}
             <div 
-              className={`sidebar-item p-3 cursor-pointer ${
+              role="menuitem"
+              tabIndex={0}
+              aria-expanded={menuItem.type === 'expandable' ? expandedMenus[menuItem.id] : undefined}
+              aria-label={`${menuItem.label} ${menuItem.type === 'expandable' ? 'menu' : 'navigation item'}`}
+              className={`sidebar-item p-3 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                 isActiveParent(menuItem) ? 'active' : ''
               } ${menuItem.type === 'expandable' ? 'expandable' : ''}`}
               onClick={() => {
@@ -52,6 +63,13 @@ const Sidebar = ({ onSectionChange }) => {
                   handleSubmenuToggle(menuItem.id, { stopPropagation: () => {} })
                 }
               }}
+              onKeyDown={(e) => handleKeyNavigation(() => {
+                if (menuItem.type === 'single') {
+                  handleSectionClick(menuItem.label, menuItem.id)
+                } else {
+                  handleSubmenuToggle(menuItem.id, { stopPropagation: () => {} })
+                }
+              }, e)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -72,10 +90,14 @@ const Sidebar = ({ onSectionChange }) => {
                 {menuItem.submenu.map((subItem) => (
                   <div
                     key={subItem.value}
-                    className={`sidebar-subitem ${
+                    role="menuitem"
+                    tabIndex={0}
+                    aria-label={`${subItem.label} submenu item`}
+                    className={`sidebar-subitem focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                       activeSection === subItem.value ? 'active' : ''
                     }`}
                     onClick={() => handleSectionClick(subItem.value)}
+                    onKeyDown={(e) => handleKeyNavigation(() => handleSectionClick(subItem.value), e)}
                   >
                     {subItem.label}
                   </div>

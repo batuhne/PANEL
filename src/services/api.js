@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.potential.com
 
 export const apiService = {
   // Authentication services
-  login: async (credentials) => {
+  login: async (_credentials) => {
     // TODO: Implement AWS Cognito authentication
     // const response = await fetch(`${API_BASE_URL}/auth/login`, {
     //   method: 'POST',
@@ -28,19 +28,19 @@ export const apiService = {
     throw new Error('Backend not implemented yet')
   },
 
-  selectDevice: async (deviceId) => {
+  selectDevice: async (_deviceId) => {
     // TODO: Set active device context
     throw new Error('Backend not implemented yet')
   },
 
   // Dashboard data
-  getDashboardData: async (userType, deviceId) => {
+  getDashboardData: async (_userType, _deviceId) => {
     // TODO: Fetch dashboard data based on user type and device
     throw new Error('Backend not implemented yet')
   },
 
   // Real-time data via WebSocket
-  connectToLiveData: (deviceId, onMessage) => {
+  connectToLiveData: (_deviceId, _onMessage) => {
     // TODO: Implement WebSocket connection to AWS IoT Core
     // const ws = new WebSocket(`${WS_URL}/live-data/${deviceId}`)
     // ws.onmessage = onMessage

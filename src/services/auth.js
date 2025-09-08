@@ -16,7 +16,7 @@ export const authService = {
   },
 
   // Sign in with email/password
-  signIn: async (email, password) => {
+  signIn: async (_email, _password) => {
     // TODO: Implement AWS Cognito sign in
     // const user = await Auth.signIn(email, password)
     // authService.currentUser = user

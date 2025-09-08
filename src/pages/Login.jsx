@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logger from '../utils/logger'
-import { handleValidationError, handleAuthError } from '../utils/errorHandler'
+import { handleValidationError } from '../utils/errorHandler'
 import useLoadingState from '../hooks/useLoadingState'
 
 const Login = () => {
@@ -182,12 +182,15 @@ const Login = () => {
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <div 
-                    className="w-5 h-5 flex items-center justify-center password-toggle" 
+                  <button 
+                    type="button"
+                    aria-label={`${isPasswordVisible ? 'Hide' : 'Show'} password`}
+                    aria-pressed={isPasswordVisible}
+                    className="w-5 h-5 flex items-center justify-center password-toggle focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md" 
                     onClick={handlePasswordToggle}
                   >
-                    <i className={`${isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 text-sm`}></i>
-                  </div>
+                    <i className={`${isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 text-sm`} aria-hidden="true"></i>
+                  </button>
                 </div>
               </div>
             </div>

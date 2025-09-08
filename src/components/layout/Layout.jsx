@@ -1,4 +1,4 @@
-import { useState } from 'react'
+// Layout component - removing unused useState import
 import Header from './Header'
 import Sidebar from './Sidebar'
 import useToggle from '../../hooks/useToggle'

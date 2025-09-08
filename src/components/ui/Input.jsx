@@ -11,10 +11,15 @@ const Input = ({
   showPasswordToggle = false,
   className = '',
   required = false,
+  id,
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [focused, setFocused] = useState(false)
+  
+  // Generate unique IDs for accessibility
+  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`
+  const errorId = error ? `${inputId}-error` : undefined
   
   const actualType = showPasswordToggle && isPasswordVisible ? 'text' : type
   
@@ -25,9 +30,9 @@ const Input = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor={inputId} className="block text-sm font-medium text-gray-700">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-red-500 ml-1" aria-label="required">*</span>}
         </label>
       )}
       
@@ -39,11 +44,14 @@ const Input = ({
         )}
         
         <input
+          id={inputId}
           type={actualType}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           required={required}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={errorId}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           className={`
@@ -72,21 +80,24 @@ const Input = ({
           <button
             type="button"
             onClick={handlePasswordToggle}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            tabIndex={-1}
+            aria-label={`${isPasswordVisible ? 'Hide' : 'Show'} password`}
+            aria-pressed={isPasswordVisible}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md"
+            tabIndex={0}
           >
             <i 
               className={`${
                 isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'
               } text-gray-400 hover:text-primary transition-colors text-sm`}
+              aria-hidden="true"
             ></i>
           </button>
         )}
       </div>
       
       {error && (
-        <p className="text-sm text-red-600 flex items-center">
-          <i className="ri-error-warning-line mr-1"></i>
+        <p id={errorId} role="alert" className="text-sm text-red-600 flex items-center">
+          <i className="ri-error-warning-line mr-1" aria-hidden="true"></i>
           {error}
         </p>
       )}

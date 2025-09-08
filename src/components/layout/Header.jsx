@@ -70,29 +70,46 @@ const Header = ({ currentSection = 'Overview', isAdmin = false }) => {
             </div>
             <button 
               onClick={handleProfileMenuToggle}
-              className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              aria-label="Toggle profile menu"
+              aria-expanded={showProfileMenu}
+              aria-controls="profile-dropdown"
+              className="text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md"
             >
-              <i className="ri-more-2-line"></i>
+              <i className="ri-more-2-line" aria-hidden="true"></i>
             </button>
           </div>
           
           {/* Profile Dropdown */}
           {showProfileMenu && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <i className="ri-user-line mr-2"></i>
+            <div 
+              id="profile-dropdown"
+              role="menu"
+              aria-labelledby="profile-menu-button"
+              className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+            >
+              <button 
+                role="menuitem"
+                className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                onClick={() => {}}
+              >
+                <i className="ri-user-line mr-2" aria-hidden="true"></i>
                 Profile Settings
-              </a>
-              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <i className="ri-settings-line mr-2"></i>
+              </button>
+              <button 
+                role="menuitem"
+                className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
+                onClick={() => {}}
+              >
+                <i className="ri-settings-line mr-2" aria-hidden="true"></i>
                 Preferences
-              </a>
+              </button>
               <div className="border-t border-gray-100 my-1"></div>
               <button 
+                role="menuitem"
                 onClick={handleSignOut}
-                className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
               >
-                <i className="ri-logout-circle-line mr-2"></i>
+                <i className="ri-logout-circle-line mr-2" aria-hidden="true"></i>
                 Sign Out
               </button>
             </div>
