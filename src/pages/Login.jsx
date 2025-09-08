@@ -1,116 +1,96 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logger from '../utils/logger'
-import { handleValidationError } from '../utils/errorHandler'
 import useLoadingState from '../hooks/useLoadingState'
+import useFormValidation from '../hooks/useFormValidation'
+import Input from '../components/ui/Input'
+import Button from '../components/ui/Button'
+import Checkbox from '../components/ui/Checkbox'
+import { ValidationError } from '../utils/validation-errors'
+
+const createValidationRules = () => ({
+  email: (value) => {
+    if (!value || value.trim() === '') {
+      throw new ValidationError('email', 'Email is required')
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(value)) {
+      throw new ValidationError('email', 'Please enter a valid email address')
+    }
+    return true
+  },
+  password: (value) => {
+    if (!value || value.trim() === '') {
+      throw new ValidationError('password', 'Password is required')
+    }
+    return true
+  }
+})
+
+const simulateAuthenticationRequest = async (credentials) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const validEmails = ['admin@potential.com', 'user@potential.com']
+      
+      if (!validEmails.includes(credentials.email)) {
+        reject(new Error('Invalid email or password'))
+        return
+      }
+
+      const userType = credentials.email === 'admin@potential.com' ? 'admin' : 'user'
+      resolve({ userType })
+    }, 2000)
+  })
+}
 
 const Login = () => {
   const navigate = useNavigate()
   
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  })
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [validationError, setValidationError] = useState(null)
-  
-  // loading state management
   const {
-    isLoading,
-    error: authError,
-    execute: executeLogin
+    values,
+    errors,
+    isSubmitting,
+    updateFieldValue,
+    handleFormSubmit
+  } = useFormValidation({
+    initialValues: {
+      email: '',
+      password: '',
+      rememberMe: false
+    },
+    validationRules: createValidationRules(),
+    onSubmit: async (formData) => {
+      logger.info('Login attempt initiated', { 
+        email: formData.email,
+        action: 'login_attempt',
+        userAgent: navigator.userAgent.substring(0, 50)
+      })
+      
+      const result = await simulateAuthenticationRequest(formData)
+      
+      localStorage.setItem('userType', result.userType)
+      
+      logger.info('Login successful', { 
+        email: formData.email,
+        userType: result.userType,
+        action: 'login_success'
+      })
+      
+      navigate('/devices')
+    }
+  })
+
+  // Keep legacy error handling for compatibility
+  const {
+    error: authError
   } = useLoadingState({
     operation: 'user_login',
-    timeout: 10000, // 10 second timeout
+    timeout: 10000,
     maxRetries: 2,
-    autoRetry: false // Manual retry for login
+    autoRetry: false
   })
   
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    
-    // Clear previous errors
-    setValidationError(null)
-    
-    // Validate form inputs
-    if (!formData.email || !formData.password) {
-      const validationResult = handleValidationError(
-        'email_password', 
-        'Email and password are required',
-        { email: formData.email, password: !!formData.password }
-      )
-      setValidationError(validationResult.error)
-      return
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      const validationResult = handleValidationError(
-        'email',
-        'Please enter a valid email address',
-        formData.email
-      )
-      setValidationError(validationResult.error)
-      return
-    }
-    
-    try {
-      await executeLogin(async () => {
-        logger.info('Login attempt initiated', { 
-          email: formData.email,
-          action: 'login_attempt',
-          userAgent: navigator.userAgent.substring(0, 50)
-        })
-        
-        // Simulate API call with user type detection
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            // Simulate authentication logic
-            const validEmails = ['admin@potential.com', 'user@potential.com']
-            
-            if (!validEmails.includes(formData.email)) {
-              reject(new Error('Invalid email or password'))
-              return
-            }
-
-            // Determine user type based on login credentials
-            const userType = formData.email === 'admin@potential.com' ? 'admin' : 'user'
-            
-            // Store user type in localStorage for DeviceSelection to use
-            localStorage.setItem('userType', userType)
-            
-            logger.info('Login successful', { 
-              email: formData.email,
-              userType,
-              action: 'login_success'
-            })
-            
-            resolve({ userType })
-          }, 2000)
-        })
-      }, {
-        email: formData.email,
-        rememberMe,
-        loginAttempt: true
-      })
-      
-      // Navigate to device selection on successful login
-      navigate('/devices')
-      
-    } catch (error) {
-      // Error is already handled by useLoadingState and errorHandler
-      logger.warn('Login failed', {
-        email: formData.email,
-        errorType: error.name,
-        action: 'login_failed'
-      })
-    }
-  }
-  
-  const handlePasswordToggle = () => {
-    setIsPasswordVisible(!isPasswordVisible)
+  const handleRememberMeChange = (checked) => {
+    updateFieldValue('rememberMe', checked)
   }
   
   return (
@@ -123,108 +103,66 @@ const Login = () => {
             </h1>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleFormSubmit}>
             {/* Error Messages */}
-            {(validationError || authError) && (
+            {(errors.general || authError) && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <div className="flex items-center">
                   <i className="ri-error-warning-line text-red-600 mr-2" aria-hidden="true" />
                   <p className="text-sm text-red-700" role="alert">
-                    {validationError?.message || authError?.message || 'An error occurred during login'}
+                    {errors.general || authError?.message || 'An error occurred during login'}
                   </p>
                 </div>
               </div>
             )}
 
             {/* Email Input */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <div className="w-5 h-5 flex items-center justify-center">
-                    <i className="ri-mail-line text-gray-400 text-sm"></i>
-                  </div>
-                </div>
-                <input 
-                  type="email" 
-                  id="email" 
-                  name="email" 
-                  placeholder="Enter your email address"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm input-focus transition-all duration-200"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
-              </div>
-            </div>
+            <Input
+              label="Email Address"
+              type="email"
+              value={values.email}
+              onChange={(e) => updateFieldValue('email', e.target.value)}
+              placeholder="Enter your email address"
+              error={errors.email}
+              icon="ri-mail-line"
+              required
+              ariaLabel="Email address input"
+            />
 
             {/* Password Input */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <div className="w-5 h-5 flex items-center justify-center">
-                    <i className="ri-lock-line text-gray-400 text-sm"></i>
-                  </div>
-                </div>
-                <input 
-                  type={isPasswordVisible ? "text" : "password"}
-                  id="password" 
-                  name="password" 
-                  placeholder="Enter your password"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg text-sm input-focus transition-all duration-200"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <button 
-                    type="button"
-                    aria-label={`${isPasswordVisible ? 'Hide' : 'Show'} password`}
-                    aria-pressed={isPasswordVisible}
-                    className="w-5 h-5 flex items-center justify-center password-toggle focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md" 
-                    onClick={handlePasswordToggle}
-                  >
-                    <i className={`${isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'} text-gray-400 text-sm`} aria-hidden="true"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <Input
+              label="Password"
+              type="password"
+              value={values.password}
+              onChange={(e) => updateFieldValue('password', e.target.value)}
+              placeholder="Enter your password"
+              error={errors.password}
+              icon="ri-lock-line"
+              showPasswordToggle
+              required
+              ariaLabel="Password input"
+            />
 
             {/* Remember Me Checkbox */}
             <div className="flex items-center">
-              <input 
-                type="checkbox" 
-                id="remember" 
-                name="remember" 
-                className="checkbox-custom"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+              <Checkbox
+                id="remember"
+                checked={values.rememberMe}
+                onChange={handleRememberMeChange}
+                label="Remember me"
               />
-              <label htmlFor="remember" className="ml-3 text-sm text-gray-700 cursor-pointer">
-                Remember me
-              </label>
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
-              className="w-full bg-primary hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isLoading}
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              className="w-full"
+              ariaLabel="Sign in to platform"
             >
-              {isLoading ? (
-                <>
-                  <i className="ri-loader-4-line animate-spin mr-2"></i>
-                  Signing In...
-                </>
-              ) : (
-                'Sign In to Platform'
-              )}
-            </button>
+              {isSubmitting ? 'Signing In...' : 'Sign In to Platform'}
+            </Button>
           </form>
           
           {/* Demo Credentials */}
