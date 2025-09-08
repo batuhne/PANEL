@@ -16,7 +16,7 @@ This repository contains **only the frontend React application**.
 - **TailwindCSS 3.4.17** - Utility-first CSS framework  
 - **React Router DOM 6.30.1** - Client-side routing
 - **RemixIcon 4.6.0** - Comprehensive icon library
-- **JavaScript** - Pure JavaScript implementation (no TypeScript)
+- **JavaScript** - Pure JavaScript implementation
 
 ## Project Structure
 
@@ -27,13 +27,17 @@ src/
 │   │   ├── Header.jsx   # Top navigation bar
 │   │   ├── Sidebar.jsx  # User navigation menu
 │   │   ├── AdminSidebar.jsx  # Admin navigation menu
-│   │   └── DashboardLayout.jsx
+│   │   ├── DashboardLayout.jsx
+│   │   ├── AdminDashboardLayout.jsx
+│   │   └── Layout.jsx
 │   ├── ui/              # Base UI components
 │   │   ├── Button.jsx   # Reusable button component
 │   │   ├── Input.jsx    # Form input component
 │   │   ├── Checkbox.jsx # Custom checkbox
 │   │   └── LoadingSpinner.jsx
 │   └── ErrorBoundary.jsx # React error boundary for error catching
+├── config/              # Environment and configuration
+│   └── environment.js   # Environment configuration
 ├── pages/               # Route components
 │   ├── Login.jsx        # Authentication page
 │   ├── DeviceSelection.jsx  # Device/field selection
@@ -51,8 +55,13 @@ src/
 │   ├── logger.js        # Structured logging system
 │   ├── errors.js        # Custom error classes
 │   └── errorHandler.js  # Centralized error handling
-└── data/                # Configuration data
-    └── menuConfig.js    # Navigation menu configuration
+├── data/                # Configuration data
+│   └── menuConfig.js    # Navigation menu configuration
+├── assets/              # Static assets
+│   └── react.svg
+├── App.jsx              # Main application component
+├── main.jsx             # Application entry point
+└── index.css            # Global styles
 ```
 
 ## Design System
@@ -80,7 +89,7 @@ src/
 ### **Installation**
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/batuhne/PANEL
 cd potential-frontend
 
 # Install dependencies
